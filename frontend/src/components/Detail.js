@@ -1,14 +1,34 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useParams } from 'react-router-dom';
+import db from '../firebase';
 
 const Detail = () => {
+  const { id } = useParams();
+  const [detailData, setDetailData] = useState({});
+
+  useEffect(() => {
+    const fatchMovies = async () => {
+      try {
+        const movie = await (
+          await db.collection('movies').doc(id).get()
+        ).data();
+        // console.log(movie);
+        setDetailData(movie);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fatchMovies();
+  }, [id]);
+
   return (
     <Container>
       <Background>
-        <img src='https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/4F39B7E16726ECF419DD7C49E011DD95099AA20A962B0B10AA1881A70661CE45/scale?width=1440&aspectRatio=1.78&format=jpeg' />
+        <img src={detailData.backgroundImg} />
       </Background>
       <ImageTitle>
-        <img src='https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/D7AEE1F05D10FC37C873176AAA26F777FC1B71E7A6563F36C6B1B497CAB1CEC2/scale?width=1440&aspectRatio=1.78' />
+        <img src={detailData.titleImg} />
       </ImageTitle>
       <Controls>
         <PlayButton>
@@ -27,16 +47,8 @@ const Detail = () => {
           <img src='/images/group-icon.png'></img>
         </GroupWatchButton>
       </Controls>
-      <SubTitle>2019-07-12118 minutesFamilyAdventureAnimation</SubTitle>
-      <Description>
-        Simba idolizes his father, King Mufasa, and takes to heart his own royal
-        destiny. But not everyone in the kingdom celebrates the new cub's
-        arrival. Scar, Mufasa's brother—and former heir to the throne—has plans
-        of his own. The battle for Pride Rock is ravaged with betrayal, tragedy
-        and drama, ultimately resulting in Simba's exile. With help from a
-        curious pair of newfound friends, Simba will have to figure out how to
-        grow up and take back what is rightfully his.
-      </Description>
+      <SubTitle>{detailData.subTitle}</SubTitle>
+      <Description>{detailData.description}</Description>
     </Container>
   );
 };
